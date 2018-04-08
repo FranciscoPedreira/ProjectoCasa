@@ -5,6 +5,7 @@
 <%@ page import="org.hibernate.SessionFactory" %>
 <%@ page import="org.hibernate.query.Query" %>
 <%@ page import="pt.francisco.hibernate.model.User" %>
+<%@ page import="pt.francisco.hibernate.model.Employee" %>
 <%@ page import="pt.francisco.hibernate.util.HibernateUtil" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.hibernate.Session" %>
@@ -32,22 +33,48 @@
    	 
    	        /*fetching objects from the database in hibernate*/
    	 
-   	        Query query = sess.createQuery("from User where username = :username");
-   	        query.setParameter("username", username);
-   	        ArrayList<User> list = (ArrayList<User>) query.list();
-   	        for(User u : list) {
+   	        Query queryUser = sess.createQuery("from User where username = :username");
+   	        queryUser.setParameter("username", username);
+   	        ArrayList<User> listUser = (ArrayList<User>) queryUser.list();
+   	        for(User u : listUser) {
    	        	System.out.println(u.getUsername() + " - " + u.getPassword());
    	        }
+   	        application.setAttribute("listUser", listUser);
+   	        
+   	     	System.out.println("########## EMPLOYEES ##########");
+   	        
+	   	    Query queryEmployee = sess.createQuery("from Employee");
+	        ArrayList<Employee> listEmployee = (ArrayList<Employee>) queryEmployee.list();
+	        for(Employee e : listEmployee) {
+	        	System.out.println(e.getId().getFirstName() + " - " + e.getId().getLastName() + " - "
+	        	+ e.getCountry() + " - " + e.getAddress() + " - " + e.getRole());
+	        }
 
+	        application.setAttribute("listEmployee", listEmployee);
 		}
 	%>
 	
 	<body>
-	<c:if test='${passWord.equals("123")}'>
+	<c:if test="${param.userName.equals(listUser.get(0).getUsername()) && param.passWord.equals(listUser.get(0).getPassword())}">
+	
 		<% System.out.println("Rendering message..."); %>
+		
+		<h1>${message}</h1>
+		
+		<c:forEach items="${listEmployee}" var="e"> 
+		  <tr>
+		    <td>${e.getId().getFirstName()}</td>
+		    <td>${e.getId().getLastName()}</td>
+		    <td>${e.getCountry()}</td>
+		    <td>${e.getAddress()}</td>
+		    <td>${e.getRole()}</td>
+		  </tr>
+		  <br />
+		</c:forEach>
+	
 	</c:if>
 	
-		<h1>${message}</h1>
+		
 	
 	</body>
 	
